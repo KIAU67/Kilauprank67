@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anda kena prank😹</title>
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: sans-serif;
+    background: #111 center/cover no-repeat fixed;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .box {
+    background: rgba(0,0,0,0.85);
+    padding: 25px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 380px;
+    text-align: center;
+  }
+  h1 { margin: 0 0 10px 0; font-size: 1.6rem; }
+  input[type="password"],
+  input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #555;
+    background: #222;
+    color: white;
+    font-size: 16px;
+  }
+  button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .btn-login { background: #7c5cff; color: white; }
+  .btn-play { background: #1abc9c; color: white; }
+  .btn-back { background: #444; color: white; }
+  .btn-reset { background: #c0392b; color: white; }
+  .status { margin-top: 8px; font-size: 14px; color: #7dffa3; min-height: 20px; }
+  .error { color: #ff6b6b; }
+  #admin-page { display: none; }
+  img { max-width: 100%; max-height: 160px; margin-top: 10px; border-radius: 8px; display: none; }
+  .footer { margin-top: 15px; color: #888; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<audio id="bgAudio" loop></audio>
+
+<!-- HALAMAN PASSWORD -->
+<div id="prank-page" class="box">
+  <h1>Anda kena prank😹</h1>
+  <p>Masukkan password</p>
+  <input type="password" id="password" placeholder="Password..." autofocus>
+  <button class="btn-login" onclick="login()">Masuk</button>
+  <div class="status" id="loginStatus"></div>
+  <div class="footer">By:kilau</div>
+</div>
+
+<!-- HALAMAN ADMIN -->
+<div id="admin-page" class="box">
+  <h1>Server Admin</h1>
+
+  <p><b>1. Pilih Gambar</b></p>
+  <input type="file" id="imgFile" accept="image/*" onchange="setImage(this)">
+  <img id="preview">
+  <div class="status" id="imgStatus"></div>
+
+  <br>
+
+  <p><b>2. Pilih Sound MP3</b></p>
+  <input type="file" id="soundFile" accept="audio/*" onchange="setSound(this)">
+  <button class="btn-play" onclick="playTest()">▶ Play Test</button>
+  <div class="status" id="soundStatus"></div>
+
+  <br><br>
+  <button class="btn-back" onclick="back()">← Kembali</button>
+  <button class="btn-reset" onclick="resetAll()">Reset Semua</button>
+</div>
+
+<script>
+  const PASSWORD = "anjay67";
+
+  function login() {
+    const pass = document.getElementById("password").value.trim();
+    if (pass === PASSWORD) {
+      document.getElementById("prank-page").style.display = "none";
+      document.getElementById("admin-page").style.display = "block";
+      document.getElementById("password").value = "";
+      tryPlay();
+    } else {
+      document.getElementById("loginStatus").innerText = "Password salah!";
+      document.getElementById("loginStatus").className = "status error";
+    }
+  }
+
+  // Tekan Enter juga bisa
+  document.getElementById("password").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") login();
+  });
+
+  function setImage(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      document.getElementById("imgStatus").innerText = "Gambar terlalu besar!";
+      document.getElementById("imgStatus").className = "status error";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      localStorage.setItem("prank_img", e.target.result);
+      document.body.style.backgroundImage = `url(${e.target.result})`;
+      document.getElementById("preview").src = e.target.result;
+      document.getElementById("preview").style.display = "block";
+      document.getElementById("imgStatus").innerText = "✓ Gambar berhasil diset!";
+      document.getElementById("imgStatus").className = "status";
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function setSound(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (file.size > 2.5 * 1024 * 1024) {
+      document.getElementById("soundStatus").innerText = "File terlalu besar!";
+      document.getElementById("soundStatus").className = "status error";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      localStorage.setItem("prank_sound", e.target.result);
+      const audio = document.getElementById("bgAudio");
+      audio.src = e.target.result;
+      document.getElementById("soundStatus").innerText = "✓ Sound berhasil disimpan!";
+      document.getElementById("soundStatus").className = "status";
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function playTest() {
+    const audio = document.getElementById("bgAudio");
+    if (!audio.src) {
+      alert("Belum ada sound!");
+      return;
+    }
+    audio.currentTime = 0;
+    audio.play();
+  }
+
+  function back() {
+    document.getElementById("admin-page").style.display = "none";
+    document.getElementById("prank-page").style.display = "block";
+    tryPlay();
+  }
+
+  function resetAll() {
+    if (confirm("Hapus semua?")) {
+      localStorage.removeItem("prank_img");
+      localStorage.removeItem("prank_sound");
+      document.body.style.backgroundImage = "none";
+      document.getElementById("bgAudio").src = "";
+      document.getElementById("preview").style.display = "none";
+      document.getElementById("imgStatus").innerText = "";
+      document.getElementById("soundStatus").innerText = "Semua dihapus";
+    }
+  }
+
+  function tryPlay() {
+    const audio = document.getElementById("bgAudio");
+    if (audio.src) audio.play().catch(()=>{});
+  }
+
+  // Load saat dibuka
+  window.onload = function() {
+    const img = localStorage.getItem("prank_img");
+    const sound = localStorage.getItem("prank_sound");
+
+    if (img) {
+      document.body.style.backgroundImage = `url(${img})`;
+      document.getElementById("preview").src = img;
+      document.getElementById("preview").style.display = "block";
+    }
+    if (sound) {
+      document.getElementById("bgAudio").src = sound;
+    }
+  };
+
+  // Supaya audio bisa play
+  document.body.addEventListener("click", tryPlay);
+</script>
+</body>
+</html>
